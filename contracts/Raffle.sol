@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.8;
+pragma solidity ^0.8.0;
 
 import "@chainlink/contracts/src/v0.8/vrf/VRFConsumerBaseV2.sol";
 import "@chainlink/contracts/src/v0.8/vrf/interfaces/VRFCoordinatorV2Interface.sol";
@@ -24,7 +24,7 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatibleInterface {
 
     uint256 private immutable i_entranceFee;
     address payable[] private s_players;
-    VRFCoordiantorV2Interface private immutable i_vrfCoordiantor;
+    VRFCoordinatorV2Interface private immutable i_vrfCoordiantor;
     bytes32 private immutable i_gasLane;
     uint64 private immutable i_subscriptionId;
     uint16 private constant REQUEST_CONFIRMATIONS = 3;
@@ -47,7 +47,7 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatibleInterface {
         uint256 interval
     ) VRFConsumerBaseV2(vrfCoordinatorV2) {
         i_entranceFee = entranceFee;
-        i_vrfCoordiantor = VRFCoordiantorV2Interface(vrfCoordinatorV2);
+        i_vrfCoordiantor =  VRFCoordinatorV2Interface(vrfCoordinatorV2);
         i_gasLane = gasLane;
         i_subscriptionId = subscriptionId;
         i_callbackGasLimit = callbackGasLimit;
@@ -67,8 +67,11 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatibleInterface {
         emit RaffleEnter(msg.sender);
     }
 
-    function pickRandomWinner() external {}
+    // function pickRandomWinner() external {}
 
+    /**
+     *   a call back function of requestRandomWords()
+     */
     function fulfillRandomWords(
         uint256 requestId,
         uint256[] memory randomWords
@@ -86,8 +89,27 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatibleInterface {
         s_lastTimeStemp = block.timestamp;
     }
 
+  /**
+      * AutomationCompatibleInterface 的方法
+      * 确认当前能否调用 performUpkeep
+     */
+    function checkUpkeep(
+        bytes memory /* checkData */
+    )
+        public
+        view
+        override
+        returns (bool upkeepNeeded, bytes memory /* performData */)
+    {
+        bool isOpen = (RaffleState.OPEN == s_raffleState);
+        bool timePassed = (block.timestamp - s_lastTimeStemp) > i_interval;
+        bool hasPlayers = s_players.length > 0;
+        bool hasBalance = address(this).balance > 0;
+        upkeepNeeded = isOpen && timePassed && hasBalance && hasPlayers;
+    }
+
     function performUpkeep(bytes calldata /* performData */) external override {
-        (bool upkeepNeed, ) = checkUpkeep("");
+        (bool upkeepNeed,) = checkUpkeep("");
         if (!upkeepNeed) {
             revert Raffle_UpKeepNotNeeded(
                 address(this).balance,
@@ -106,19 +128,7 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatibleInterface {
         emit RequestRaffleWinner(requesetId);
     }
 
-    function checkUpkeep(
-        bytes calldata checkData
-    )
-        public
-        override
-        returns (bool upkeepNeeded, bytes memory /* performData */)
-    {
-        bool isOpen = (RaffleState.OPEN == s_raffleState);
-        bool timePassed = (block.timestamp - s_lastTimeStemp) > i_interval;
-        bool hasPlayers = s_players.length > 0;
-        bool hasBalance = address(this).balance > 0;
-        upKeepNeedede = isOpen && timePassed && hasBalance && hasPlayers;
-    }
+  
 
     function getEntranceFee() public view returns (uint256) {
         return i_entranceFee;
@@ -138,5 +148,9 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatibleInterface {
 
     function getNumbers() public pure returns (uint256) {
         return NUM_WORDS;
+    }
+
+    function getInterval()public view returns(uint256){
+        return i_interval;
     }
 }
