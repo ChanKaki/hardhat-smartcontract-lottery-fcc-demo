@@ -8,10 +8,10 @@ const { assert, expect } = require("chai");
 !developmentChains.includes(network.name)
   ? describe.skip
   : describe("Raffle Unit Tests", async function () {
-      let raffle, vrfCoordinatorV2Mock;
+      let raffle, vrfCoordinatorV2Mock,deployer,raffEntranceFee;
       const chainId = network.config.chainId;
       beforeEach(async function () {
-        const { deployer } = await getNamedAccounts();
+       deployer  = (await getNamedAccounts()).deployer;
         // execute deployment as fixture for test /;
         await deployments.fixture("all");
         raffle = await ethers.getContract("Raffle", deployer);
@@ -19,6 +19,7 @@ const { assert, expect } = require("chai");
           "VRFCoordinatorV2Mock",
           deployer
         );
+        raffEntranceFee = await raffle.getEntranceFee();
       });
 
       describe("constructor", async function () {
@@ -39,5 +40,12 @@ const { assert, expect } = require("chai");
             "Raffle_NotEnoughETHEntered"
           );
         });
+
+        it("records players when they enther",async function(){
+          await raffle.enterRaffle({value:raffEntranceFee});
+          const playerFromContract  = await raffle.getPlayer(0);
+          assert.equal(playerFromContract,deployer);
+        })
       });
+      
     });
