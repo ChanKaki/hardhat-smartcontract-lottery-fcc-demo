@@ -47,7 +47,7 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatibleInterface {
         uint256 interval
     ) VRFConsumerBaseV2(vrfCoordinatorV2) {
         i_entranceFee = entranceFee;
-        i_vrfCoordiantor =  VRFCoordinatorV2Interface(vrfCoordinatorV2);
+        i_vrfCoordiantor = VRFCoordinatorV2Interface(vrfCoordinatorV2);
         i_gasLane = gasLane;
         i_subscriptionId = subscriptionId;
         i_callbackGasLimit = callbackGasLimit;
@@ -57,7 +57,6 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatibleInterface {
     }
 
     function enterRaffle() public payable {
-        
         if (msg.value < i_entranceFee) {
             revert Raffle_NotEnoughETHEntered();
         }
@@ -84,15 +83,16 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatibleInterface {
         if (!success) {
             revert Raffle_TransferFailed();
         }
-        emit WinnerPicked(recentWinner);
+    
         s_raffleState = RaffleState.OPEN;
         s_players = new address payable[](0);
         s_lastTimeStemp = block.timestamp;
+        emit WinnerPicked(recentWinner);
     }
 
-  /**
-      * AutomationCompatibleInterface 的方法
-      * 确认当前能否调用 performUpkeep
+    /**
+     * AutomationCompatibleInterface 的方法
+     * 确认当前能否调用 performUpkeep
      */
     function checkUpkeep(
         bytes memory /* checkData */
@@ -110,7 +110,7 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatibleInterface {
     }
 
     function performUpkeep(bytes calldata /* performData */) external override {
-        (bool upkeepNeed,) = checkUpkeep("");
+        (bool upkeepNeed, ) = checkUpkeep("");
         if (!upkeepNeed) {
             revert Raffle_UpKeepNotNeeded(
                 address(this).balance,
@@ -129,14 +129,16 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatibleInterface {
         emit RequestRaffleWinner(requesetId);
     }
 
-  
-
     function getEntranceFee() public view returns (uint256) {
         return i_entranceFee;
     }
 
     function getPlayer(uint256 index) public view returns (address) {
         return s_players[index];
+    }
+
+   function getNumberOfPalyers() public view returns (uint256) {
+        return s_players.length;
     }
 
     function getRecentWinner() public view returns (address) {
@@ -151,7 +153,11 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatibleInterface {
         return NUM_WORDS;
     }
 
-    function getInterval()public view returns(uint256){
+    function getInterval() public view returns (uint256) {
         return i_interval;
+    }
+
+    function getLatestTimeStamp() public view returns (uint256) {
+        return s_lastTimeStemp;
     }
 }

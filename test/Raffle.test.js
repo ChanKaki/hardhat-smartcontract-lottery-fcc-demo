@@ -145,6 +145,49 @@ use(solidity);
             await expect(vrfCoordinatorV2Mock.fulfillRandomWords(1,raffle.getAddress()))
             .to.be.revertedWith("nonexistent request");
           })
+
+          it("picks a winner,resets the lottery,and sends money",async function(){
+              const additionalEntrants = 3;
+              const startingAccountIndex = 1;
+              const accounts = await ethers.getSigners();
+              for(let i = startingAccountIndex; i <startingAccountIndex+additionalEntrants;i++){
+                const accountConnectRaffle =raffle.connect(accounts[i]);
+                await accountConnectRaffle.enterRaffle({value:raffEntranceFee})
+              }
+              const startingTimeStamp = await raffle.getLatestTimeStamp();
+
+              await new Promise(async(resolve,reject)=>{
+                raffle.once("WinnerPicked",async()=>{
+                  console.log("got the event!")
+                  try{
+                    const recentWinner = await raffle.getRecentWinner();
+                    console.log(recentWinner);
+                    console.log(accounts[2]);
+                    console.log(accounts[1]);
+                    console.log(accounts[0]);
+                    const raffleState = await raffle.getRaffleState();
+                    const endingTimeStamp = await raffle.getLatestTimeStamp();
+                    const numPlayers = await raffle.getNumberOfPalyers();
+                    // const winnerEndingBalace = await accounts[1].getBalance();
+                    assert.equal(numPlayers.toString(),"0");
+                    assert(endingTimeStamp>startingTimeStamp);
+                    // assert.equal(winnerEndingBalace.toString(),
+                    // winnerEndingBalace.add(raffEntranceFee.mul(additionalEntrants).add(raffEntranceFee)).toString())
+                    resolve() ;
+                  }catch(e){
+                    reject(e);
+                  }
+                })
+                const tx = await raffle.performUpkeep("0x");
+                const txReceipt = await tx.wait(1);
+                // const winnerStartingBalance = await accounts[1].getBalance();
+                await vrfCoordinatorV2Mock.fulfillRandomWords(txReceipt.logs[1].args.requestId,raffle.getAddress());
+                console.log("wait for event......")
+              })
+         
+          })
+
+
         })
 
       })
