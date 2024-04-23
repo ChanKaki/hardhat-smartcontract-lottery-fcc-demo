@@ -35,6 +35,12 @@ module.exports = {
       blockConfirmations: 6,
     },
   },
+   etherscan: {
+        // yarn hardhat verify --network <NETWORK> <CONTRACT_ADDRESS> <CONSTRUCTOR_PARAMETERS>
+        apiKey: {
+            sepolia: ETHERSCAN_API_KEY,
+        },
+      },
   namedAccounts: {
     deployer: {
       default: 0,

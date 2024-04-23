@@ -73,7 +73,7 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatibleInterface {
      *   a call back function of requestRandomWords()
      */
     function fulfillRandomWords(
-        uint256 requestId,
+        uint256  /* requestId */,
         uint256[] memory randomWords
     ) internal override {
         uint256 indexOfWinner = randomWords[0] % s_players.length;

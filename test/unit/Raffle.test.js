@@ -2,7 +2,7 @@ const { network, getNamedAccounts, deployments, ethers } = require("hardhat");
 const {
   developmentChains,
   networkConfig,
-} = require("../helper-hardhat-config");
+} = require("../../helper-hardhat-config");
 const { use,assert, expect } = require("chai");
 const { solidity } = require("ethereum-waffle");
 use(solidity);
