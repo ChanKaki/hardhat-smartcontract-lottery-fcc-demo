@@ -7,7 +7,7 @@ const networkConfig = {
     keepersUpdateInterval: "30",
     entranceFee: ethers.parseEther("0.01"),
     gasLane: "0x474e34a077df58807dbe9c96d3c009b23b3c6d0cce433e59bbf5b34f823bc56c",
-    callBackGasLimit: "5000",
+    callBackGasLimit: "50000",
     subscriptionId: "10627",
     interval: "30",
   },
@@ -17,7 +17,7 @@ const networkConfig = {
     keepersUpdateInterval: "30",
     gasLane:
       "0x474e34a077df58807dbe9c96d3c009b23b3c6d0cce433e59bbf5b34f823bc56c",
-    callBackGasLimit: "5000",
+    callBackGasLimit: "500000",
     subscriptionId: "588",
     interval: "30",
   },

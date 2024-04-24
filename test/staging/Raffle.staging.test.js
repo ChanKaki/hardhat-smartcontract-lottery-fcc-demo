@@ -23,7 +23,6 @@ developmentChains.includes(network.name)?describe.skip:
                 console.log(">>>>>>>")
                 raffle.once("WinnerPicked",async()=>{
                     console.log("WinnerPicked event fired!")
-                    resolve()
                     try{
                         const recentWinner = await raffle.getRecentWinner();
                         const raffleState = await raffle.getRaffleState();
@@ -39,25 +38,14 @@ developmentChains.includes(network.name)?describe.skip:
                     catch(error){
                       reject(error)
                     }
-
                 })
-            
-            console.log(">>>>>>>start")     
+              console.log(">>>>>>>start")     
               const tx =   await raffle.enterRaffle({ value: raffEntranceFee }); 
               await tx.wait(1);
-                const winnerStartingBalance = await accounts[0].provider.getBalance();
-                console.log(">>>>>>>winnerStartingBalance",winnerStartingBalance)     
-                 
-
+                // const winnerStartingBalance = await accounts[0].provider.getBalance();
+                // console.log(">>>>>>>winnerStartingBalance",winnerStartingBalance);
               })
-
-              
-
-
-
           })
-
-
         })
 
 })
