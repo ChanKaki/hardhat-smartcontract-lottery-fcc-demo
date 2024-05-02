@@ -1,7 +1,7 @@
 const {ethers, network} = require("hardhat");
 const fs = require("fs")
 
-const FRONT_END_ADDRESSS_FILE = "../nextjs-smartcontract-lottery-fcc-demo/contracts/contractAddress.json";
+const FRONT_END_ADDRESSS_FILE = "../nextjs-smartcontract-lottery-fcc-demo/contracts/contractAddresses.json";
 const FRONT_END_ABI_FILE = "../nextjs-smartcontract-lottery-fcc-demo/contracts/abi.json";
 
 module.exports = async function ({ getNamedAccounts, deployments }) {
